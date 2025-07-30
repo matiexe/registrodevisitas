@@ -3,7 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Google Sheet ID
 const SPREADSHEET_ID = process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID; // Replace with your Sheet ID
- console.log(process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID)
+
+let credentials:any
+const base64credentials = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+if (!base64credentials) {
+  throw new Error("GOOGLE_APPLICATION_CREDENTIALS environment variable is not set.");
+}
+const decodedCredentials = Buffer.from(base64credentials, 'base64').toString('utf-8');
+credentials = JSON.parse(decodedCredentials);
+
+
+
 export async function POST(request: NextRequest) {
   try {
     const { attendance, visitDate, information } = await request.json();
@@ -15,7 +25,7 @@ export async function POST(request: NextRequest) {
     // });
 
     const auth = new google.auth.GoogleAuth({
-      keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS, // Path to your service account key file,
+      keyFile: credentials, // Path to your service account key file,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"]
     });
 
